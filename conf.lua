@@ -2,6 +2,7 @@
 require 'lib/pl'
 require("lib/stateManager")
 require("lib/lovelyMoon")
+lip = require 'lib/LIP';
 
 function love.conf(t)
 	t.version = "0.10.2"
