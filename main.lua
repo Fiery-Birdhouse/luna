@@ -1,4 +1,5 @@
 -- Importa todos os states.
+require("states/Debug") -- FIXME: Remover na versão final
 require("states/StartSequence")
 
 -- Importa módulos necessários.
@@ -7,9 +8,11 @@ require("modules/mInputVerify")
 function love.load()
 	-- Adiciona os game states para uso futuro.
 	addState(StartSequence, "StartSequence")
+	addState(DebugMode, "Debug", 10)
 
 	-- Game state inicial.
 	enableState("StartSequence")
+	enableState("Debug")
 end
 
 function love.update(dt)
