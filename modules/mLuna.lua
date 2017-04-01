@@ -16,6 +16,10 @@ Luna.settings = {
   }
 }
 
+-- Atualiza propriedades de vídeo com os valores definidos pelo jogador
 function Luna:updateVideo()
-  love.window.setMode(self.settings.video.w, self.settings.video.h, {fullscreen = self.settings.video.fullscreen, vsync = self.settings.video.vsync})
+  love.window.setMode(self.settings.video.w, self.settings.video.h, {
+    fullscreen = self.settings.video.fullscreen,
+    vsync = self.settings.video.vsync
+  })
 end
