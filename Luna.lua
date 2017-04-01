@@ -11,10 +11,11 @@ Luna.settings = {
   video = {
     w = videoW,
     h = videoH,
-    vsync = true
+    vsync = true,
+    fullscreen = false
   }
 }
 
 function Luna:updateVideo()
-  love.window.setMode(self.settings.video.w, self.settings.video.h, {vsync = self.settings.video.vsync})
+  love.window.setMode(self.settings.video.w, self.settings.video.h, {fullscreen = self.settings.video.fullscreen, vsync = self.settings.video.vsync})
 end
