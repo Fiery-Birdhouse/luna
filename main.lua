@@ -21,6 +21,9 @@ function love.load()
   
   -- Carrega settings.cfg
   Persistence:loadSettings()
+  
+  -- Atualiza video com as definições do jogador
+  luna:updateVideo()
 end
 
 function love.update(dt)
