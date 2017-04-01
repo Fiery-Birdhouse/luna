@@ -1,5 +1,4 @@
 -- Transforma todos os comandos de entrada do love em comandos válidos para a engine
-
 class.InputVerify()
 
 commandList = {}
