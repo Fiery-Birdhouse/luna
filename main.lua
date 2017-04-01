@@ -5,9 +5,9 @@ require("states/StartSequence")
 -- Importa módulos necessários
 require("modules/mInputVerify")
 require("modules/mPersistence")
+require("modules/mLuna")
 
--- Importa classes importantes para a execução da engine
-require("Luna")
+
 luna = Luna()
 
 function love.load()
