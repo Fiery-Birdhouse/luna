@@ -4,6 +4,7 @@ require("states/StartSequence")
 
 -- Importa módulos necessários
 require("modules/mInputVerify")
+require("modules/mPersistence")
 
 -- Importa classes importantes para a execução da engine
 require("Luna")
@@ -17,6 +18,9 @@ function love.load()
 	-- Game state inicial
 	enableState("StartSequence")
 	enableState("Debug")
+  
+  -- Carrega settings.cfg
+  Persistence:loadSettings()
 end
 
 function love.update(dt)
@@ -42,4 +46,9 @@ end
 
 function love.mousereleased(x, y, button)
 	lovelyMoon.mousereleased(x, y, button)
+end
+
+function love.quit()
+  Persistence:saveSettings()
+  return false
 end
