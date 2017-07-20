@@ -1,8 +1,8 @@
--- Importa todos os states
+-- Include all states
 require("states/Debug") -- FIXME: Remover na versão final
 require("states/StartSequence")
 
--- Importa módulos necessários
+-- Include required modules
 require("modules/mInputVerify")
 require("modules/mPersistence")
 require("modules/mLuna")
@@ -11,18 +11,18 @@ require("modules/mLuna")
 luna = Luna()
 
 function love.load()
-	-- Adiciona os game states para uso futuro.
+	-- Add the game states for future use
 	addState(StartSequence, "StartSequence")
 	addState(DebugMode, "Debug", 10)
 
-	-- Game state inicial
+	-- Initial game state
 	enableState("StartSequence")
 	enableState("Debug")
-  
-  -- Carrega settings.cfg
+
+  -- Load settings.cfg
   Persistence:loadSettings()
-  
-  -- Atualiza video com as definições do jogador
+
+  -- Update video with the players settings
   luna:updateVideo()
 end
 

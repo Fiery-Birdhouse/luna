@@ -1,4 +1,3 @@
--- State inicial do jogo
 class.StartSequence()
 
 function StartSequence:load()

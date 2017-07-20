@@ -1,4 +1,4 @@
--- Módulo responsável pelas operações de salvamento e carregamento de arquivos
+-- Module responsible for saving and loading files
 class.Persistence()
 
 function Persistence:saveSettings(dir)
@@ -8,8 +8,8 @@ end
 
 function Persistence:loadSettings(dir)
   dir = dir or 'settings.cfg'
-  
-  -- Verifica se o arquivo especificado existe
+
+  -- Check whether the specified file exists
   if (love.filesystem.exists(dir)) then
     luna.settings = lip.load(dir)
   end

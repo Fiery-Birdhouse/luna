@@ -1,20 +1,19 @@
 class.DebugMode()
 
 function DebugMode:load()
-	-- Importa bibliotecas de debug
+	-- Include debug libraries
 	lovebird = require("lib/lovebird")
 	fpsGraph = require "lib/FPSGraph"
 
-	-- Cria gráficos informativos
+	-- Create informative graph
 	Info1 = fpsGraph.createGraph(0, 60)
 	Info2 = fpsGraph.createGraph(0, 90)
 	Info3 = fpsGraph.createGraph(0, 120)
 	fpsInfo = fpsGraph.createGraph()
 	memoryInfo = fpsGraph.createGraph(0, 30)
 
-	-- Informações no console
-	print("Modo debug LIGADO")
-	print("-----------------")
+	print("Debug Mode [ON]")
+	print("---------------")
 end
 
 function DebugMode:close()

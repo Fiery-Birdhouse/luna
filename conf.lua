@@ -1,4 +1,4 @@
--- Importa algumas das bibliotecas necessárias
+-- Include some necessary libs
 require 'lib/pl'
 require("lib/stateManager")
 require("lib/lovelyMoon")

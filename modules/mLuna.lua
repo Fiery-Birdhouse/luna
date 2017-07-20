@@ -1,6 +1,6 @@
 class.Luna()
 
--- Propriedades padrões
+-- Default settings
 local videoW, videoH = love.window.getDesktopDimensions()
 Luna.settings = {
   sound = {
@@ -16,7 +16,7 @@ Luna.settings = {
   }
 }
 
--- Atualiza propriedades de vídeo com os valores definidos pelo jogador
+-- Update video settings with the values that player defined
 function Luna:updateVideo()
   love.window.setMode(self.settings.video.w, self.settings.video.h, {
     fullscreen = self.settings.video.fullscreen,
