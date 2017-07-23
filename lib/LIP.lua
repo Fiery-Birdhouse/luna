@@ -30,10 +30,10 @@ local LIP = {};
 --@return The table containing all data from the INI file. [table]
 function LIP.load(fileName)
 	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
-	local file = assert(io.open(fileName, 'r'), 'Error loading file : ' .. fileName);
-	local data = {};
+	assert(love.filesystem.exists(fileName), 'Error loading file : ' .. fileName);
+  local data = {};
 	local section;
-	for line in file:lines() do
+	for line in love.filesystem.lines(fileName) do
 		local tempSection = line:match('^%[([^%[%]]+)%]$');
 		if(tempSection)then
 			section = tonumber(tempSection) and tonumber(tempSection) or tempSection;
@@ -54,7 +54,6 @@ function LIP.load(fileName)
 			data[section][param] = value;
 		end
 	end
-	file:close();
 	return data;
 end
 
@@ -64,7 +63,6 @@ end
 function LIP.save(fileName, data)
 	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
 	assert(type(data) == 'table', 'Parameter "data" must be a table.');
-	local file = assert(io.open(fileName, 'w+b'), 'Error loading file :' .. fileName);
 	local contents = '';
 	for section, param in pairs(data) do
 		contents = contents .. ('[%s]\n'):format(section);
@@ -73,8 +71,8 @@ function LIP.save(fileName, data)
 		end
 		contents = contents .. '\n';
 	end
-	file:write(contents);
-	file:close();
+
+  return love.filesystem.write(fileName, contents)
 end
 
 return LIP;
