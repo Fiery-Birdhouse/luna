@@ -10,8 +10,18 @@ function Persistence:loadSettings(dir)
   dir = dir or 'settings.cfg'
 
   -- Check whether the specified file exists
-  if (love.filesystem.exists(dir)) then
-    luna.settings = lip.load(dir)
+  if love.filesystem.exists(dir) then
+    local playerSettings = lip.load(dir) -- Load player settings
+
+    -- Iterate over INI sections
+    for section, sectionValue in pairs(playerSettings) do
+      if type(sectionValue) == "table" then
+        -- Load all fields in the section
+        for settingKey, settingValue in pairs(sectionValue) do
+          luna.settings[section][settingKey] = settingValue
+        end
+      end
+    end
   end
 end
 
