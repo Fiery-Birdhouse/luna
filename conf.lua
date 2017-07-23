@@ -6,6 +6,7 @@ lip = require 'lib/LIP';
 tiny = require("lib/tiny")
 
 function love.conf(t)
-	t.version = "0.10.2"
-	t.window.title = "Luna Engine"
+  t.identity = "luna"
+  t.version = "0.10.2"
+  t.window.title = "Luna Engine"
 end
