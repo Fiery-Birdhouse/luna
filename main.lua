@@ -1,5 +1,5 @@
 -- Include all states
-require("states/Debug") -- FIXME: Remover na versão final
+require("states/Debug")
 require("states/StartSequence")
 
 -- Include required modules
