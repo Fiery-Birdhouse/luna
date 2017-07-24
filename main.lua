@@ -1,5 +1,4 @@
 -- Include all states
-require("states/Debug")
 require("states/StartSequence")
 
 -- Include required modules
@@ -11,13 +10,18 @@ require("modules/mLuna")
 luna = Luna()
 
 function love.load()
+  -- Debug Mode
+  if arg[#arg] == "-debug" then
+    require("states/Debug")
+    addState(DebugMode, "Debug", 10)
+    enableState("Debug")
+  end
+
 	-- Add the game states for future use
 	addState(StartSequence, "StartSequence")
-	addState(DebugMode, "Debug", 10)
 
 	-- Initial game state
 	enableState("StartSequence")
-	enableState("Debug")
 
   -- Load settings.cfg
   Persistence:loadSettings()
