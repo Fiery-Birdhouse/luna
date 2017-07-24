@@ -3,7 +3,11 @@ class.Persistence()
 
 function Persistence:saveSettings(dir)
   dir = dir or 'settings.cfg'
-  lip.save(dir, luna.settings)
+    success, message = lip.save(dir, luna.settings)
+
+    if not success then
+      print(message)
+    end
 end
 
 function Persistence:loadSettings(dir)
