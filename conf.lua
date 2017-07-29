@@ -4,6 +4,7 @@ require("lib/stateManager")
 require("lib/lovelyMoon")
 lip = require 'lib/LIP';
 tiny = require("lib/tiny")
+log = require("lib/log")
 
 function love.conf(t)
   t.identity = "luna"
