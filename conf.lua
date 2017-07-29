@@ -9,4 +9,5 @@ function love.conf(t)
   t.identity = "luna"
   t.version = "0.10.2"
   t.window.title = "Luna Engine"
+  t.externalstorage = true
 end
