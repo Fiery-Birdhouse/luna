@@ -4,7 +4,6 @@ function DebugMode:load()
 	-- Include debug libraries
 	lovebird = require("lib/lovebird")
 	fpsGraph = require "lib/FPSGraph"
-	log = require("lib/log")
 
 	-- Create informative graph
 	Info1 = fpsGraph.createGraph(0, 60)
