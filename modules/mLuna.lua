@@ -4,11 +4,13 @@ class.Luna()
 local videoW, videoH = love.window.getDesktopDimensions()
 Luna.settings = {
   sound = {
+    _tweakable = {"sVolume", "mVolume"},
     sVolume = 70,
     mVolume = 80,
   },
 
   video = {
+    _tweakable = {"w", "h", "vsync", "fullscreen"},
     w = videoW,
     h = videoH,
     vsync = true,
