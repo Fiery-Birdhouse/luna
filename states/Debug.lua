@@ -12,6 +12,8 @@ function DebugMode:load()
 	fpsInfo = fpsGraph.createGraph()
 	memoryInfo = fpsGraph.createGraph(0, 30)
 
+  log.level = "trace"
+
 	log.info("Debug Mode [ON]")
 	log.info("---------------")
 end
