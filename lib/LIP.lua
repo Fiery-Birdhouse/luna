@@ -60,16 +60,30 @@ end
 --- Saves all the data from a table to an INI file.
 --@param fileName The name of the INI file to fill. [string]
 --@param data The table containing all the data to store. [table]
-function LIP.save(fileName, data)
-	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
-	assert(type(data) == 'table', 'Parameter "data" must be a table.');
+--@param tweakableOnly Define if only tweakable parameters can be stored. [boolean]
+function LIP.save(fileName, data, tweakableOnly)
+	if (type(fileName) ~= 'string') then return false, 'Parameter "fileName" must be a string.'; end;
+	if (type(data) ~= 'table') then return false, 'Parameter "data" must be a table.'; end;
+  if (type(tweakableOnly) ~= 'boolean') then return false, 'Parameter "tweakableOnly" must be boolean.'; end;
 	local contents = '';
 	for section, param in pairs(data) do
-		contents = contents .. ('[%s]\n'):format(section);
-		for key, value in pairs(param) do
-			contents = contents .. ('%s=%s\n'):format(key, tostring(value));
-		end
-		contents = contents .. '\n';
+    if (not tweakableOnly or param['_tweakable'] ~= nil) then
+      contents = contents .. ('[%s]\n'):format(section);
+
+      if (tweakableOnly) then
+        for _, key in pairs(param['_tweakable']) do
+          if param[key] ~= nil then
+            contents = contents .. ('%s=%s\n'):format(key, tostring(param[key]));
+          end
+        end
+      else
+        for key, value in pairs(param) do
+          contents = contents .. ('%s=%s\n'):format(key, tostring(value));
+        end
+      end
+
+      contents = contents .. '\n';
+    end
 	end
 
   return love.filesystem.write(fileName, contents)
