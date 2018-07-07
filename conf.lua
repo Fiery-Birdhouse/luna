@@ -5,10 +5,10 @@ require("lib/lovelyMoon")
 lip = require 'lib/LIP';
 tiny = require("lib/tiny")
 log = require("lib/log")
-
+dd = pretty.dump
 function love.conf(t)
   t.identity = "luna"
-  t.version = "0.10.2"
+  t.version = "11.1"
   t.window.title = "Luna Engine"
   t.externalstorage = true
 end
