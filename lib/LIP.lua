@@ -19,7 +19,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 --]]
---- Lua INI Parser.
+--- Lua INI Parser (modified by Luna Engine Team).
 -- It has never been that simple to use INI files with Lua.
 --@author Dynodzzo
 
@@ -29,8 +29,9 @@ local LIP = {};
 --@param fileName The name of the INI file to parse. [string]
 --@return The table containing all data from the INI file. [table]
 function LIP.load(fileName)
-	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
-	assert(love.filesystem.exists(fileName), 'Error loading file : ' .. fileName);
+  if (type(fileName) ~= 'string') then log.warn('Parameter "fileName" must be a string.'); end;
+  if (love.filesystem.getInfo(fileName) == nil) then log.error('Error loading file: ' .. fileName); return {}; end;
+
   local data = {};
 	local section;
 	for line in love.filesystem.lines(fileName) do
