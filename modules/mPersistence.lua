@@ -14,7 +14,7 @@ function Persistence:loadSettings(dir)
   dir = dir or 'settings.cfg'
 
   -- Check whether the specified file exists
-  if love.filesystem.exists(dir) then
+  if love.filesystem.getInfo(dir) ~= nil then
     local playerSettings = lip.load(dir) -- Load player settings
 
     -- Iterate over INI sections
