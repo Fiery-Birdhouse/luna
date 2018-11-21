@@ -9,3 +9,4 @@ Libraries used:
 * [LIP](https://github.com/Dynodzzo/Lua_INI_Parser)
 * [Tiny-ECS](https://github.com/bakpakin/tiny-ecs)
 * [log.lua](https://github.com/rxi/log.lua)
+* [LoveDebug](https://github.com/flamendless/lovedebug)
