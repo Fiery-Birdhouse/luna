@@ -1,3 +1,5 @@
+require("lib/lovedebug")
+
 -- Include all states
 require("states/StartSequence")
 
