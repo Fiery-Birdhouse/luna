@@ -6,6 +6,8 @@ lip = require 'lib/LIP';
 tiny = require("lib/tiny")
 log = require("lib/log")
 dd = pretty.dump
+
+-- Luna specific config
 log.level = "error"
 
 function love.conf(t)
