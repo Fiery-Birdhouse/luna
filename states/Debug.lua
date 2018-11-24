@@ -15,7 +15,6 @@ function DebugMode:load()
   log.level = "trace"
 
 	log.info("Debug Mode [ON]")
-	log.info("---------------")
 end
 
 function DebugMode:close()
