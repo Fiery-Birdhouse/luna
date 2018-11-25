@@ -12,7 +12,9 @@ function DebugMode:load()
 	fpsInfo = fpsGraph.createGraph()
 	memoryInfo = fpsGraph.createGraph(0, 30)
 
-  log.level = "trace"
+	-- Engine settings for Debug Mode
+	_DebugInterface.DrawOnTop = true
+	log.level = "trace"
 
 	log.info("Debug Mode [ON]")
 end
