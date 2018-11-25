@@ -365,6 +365,13 @@ _Debug.keyConvert = function(key)
 			_Debug.tick = 0
 			_Debug.drawTick = false
 		end
+	elseif key == "delete" then
+		local suffix = _Debug.input:sub(_Debug.inputMarker + 2, #_Debug.input)
+		_Debug.input = _Debug.input:sub(1, _Debug.inputMarker) .. suffix
+		if _Debug.inputMarker > 0 then
+			_Debug.tick = 0
+			_Debug.drawTick = false
+		end
 	elseif key == 'f5' then
 		_Debug.liveDo=true
 	elseif key == "return" then 
@@ -538,7 +545,6 @@ _Debug.handleKey = function(a)
 				love.system.setClipboardText(_Debug.input)
 				return
 			elseif  a:lower()=='l' then
-				log.trace("L key pressed")
 				_Debug.clear()
 				return
 			else
