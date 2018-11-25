@@ -27,50 +27,74 @@ local _Debug = {
 	Proposals = {},
 	ProposalLocation = _G;
 	Proposal_String = "",
-	
+
 	trackKeys = {},
 	keyRepeatInterval = 0.05,
 	keyRepeatDelay = 0.4,
-	
+
 	liveOutput='',
 	liveLastModified= love.filesystem.getInfo("main.lua").modtime,
 	liveDo=false
 }
 
---Settings
-_DebugSettings = {
+--Global var and functions
+_DebugInterface = {
 	MultipleErrors = false,
-	OverlayColor = {0, 0, 0},
+	OverlayColor = {0, 0, 0, 0.7},
 
-	DrawOnTop = true,
-	
+	DrawOnTop = false,
+
 	LiveAuto = false,
 	LiveFile = 'main.lua',
 	LiveReset = false,
-    HaltExecution = true,
-    AutoScroll = false,
+	HaltExecution = true,
+	AutoScroll = false,
 }
 
-
 --Print all settings
-_DebugSettings.Settings = function()
+_DebugInterface.Settings = function()
 	print("Settings:")
 
-	print("   _DebugSettings.MultipleErrors  [Boolean]  Controls if errors should appear multiple times, default is false")
-	print("   _DebugSettings.OverlayColor  [{int, int, int}]  Sets the color of the overlay, default is {0,0,0}")
-	print("   _DebugSettings.LiveAuto  [Boolean]  Check if the code should be reloaded when it's modified, default is false")
-	print("   _DebugSettings.LiveFile  [String]  Sets the file that lovedebug reloads, default is 'main.lua'")
-	print("   _DebugSettings.LiveFile  [{String,String,...}]  Sets the files, has a table, that lovedebug reloads, can be multiple")
-	print("   _DebugSettings.LiveReset  [Boolean]  Rather or not love.load() should be reloaded if the code is HotSwapped, default is false")
-	print("   _DebugSettings.DrawOnTop  [Boolean]  If the errors and prints should be dispalyed on top of the screen, default is false")
-	print("   _DebugSettings.HaltExecution  [Boolean]  Rather or not to halt program execution while console is open, default is true")
-	print("   _DebugSettings.AutoScroll  [Boolean]  Rather or not to auto scroll the console once output fills up the console, default is false")
+	print("   _DebugInterface.MultipleErrors  [Boolean]  Controls if errors should appear multiple times, default is false")
+	print("   _DebugInterface.OverlayColor  [{float, float, float, float}]  Sets the color of the overlay, default is {0,0,0,0.7}")
+	print("   _DebugInterface.LiveAuto  [Boolean]  Check if the code should be reloaded when it's modified, default is false")
+	print("   _DebugInterface.LiveFile  [String]  Sets the file that lovedebug reloads, default is 'main.lua'")
+	print("   _DebugInterface.LiveFile  [{String,String,...}]  Sets the files, has a table, that lovedebug reloads, can be multiple")
+	print("   _DebugInterface.LiveReset  [Boolean]  Rather or not love.load() should be reloaded if the code is HotSwapped, default is false")
+	print("   _DebugInterface.DrawOnTop  [Boolean]  If the errors and prints should be dispalyed on top of the screen, default is false")
+	print("   _DebugInterface.HaltExecution  [Boolean]  Rather or not to halt program execution while console is open, default is true")
+	print("   _DebugInterface.AutoScroll  [Boolean]  Rather or not to auto scroll the console once output fills up the console, default is false")
 end
 
-
-
-
 local super_print = print
+
+--Handle log input
+_DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgb)
+	super_print(
+		string.format(
+			"%s[%-6s%s]%s %s: %s",
+			color or "",
+			modeName,
+			time,
+			color and "\27[0m" or "",
+			lineinfo,
+			msg
+		)
+	)
+
+	table.insert(_Debug.prints, 
+		string.format(
+			"[%-6s%s] %s: %s",
+			modeName,
+			time,
+			lineinfo,
+			msg
+		)
+	)
+
+	table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
+	table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
+end
 
 --Override print and call super
 _G["print"] = function(...)
@@ -84,10 +108,9 @@ _G["print"] = function(...)
 	table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
 end
 
-
 --Error catcher
 _Debug.handleError = function(err)
-	if _DebugSettings.MultipleErrors == false then
+	if _DebugInterface.MultipleErrors == false then
 		for i,v in pairs(_Debug.errors) do
 			if v == err then
 				return --Don't print the same error multiple times!
@@ -189,8 +212,8 @@ _Debug.overlay = function()
 	local fontSize = _Debug.Font:getHeight()
 	local w = love.graphics.getWidth()
 	local h = love.graphics.getHeight()
-	local R, G, B = unpack(_DebugSettings.OverlayColor)
-	love.graphics.setColor(R, G, B, 220)
+	local R, G, B, A = unpack(_DebugInterface.OverlayColor)
+	love.graphics.setColor(R, G, B, A)
 	love.graphics.rectangle("fill", 0, 0, w, h)
 	love.graphics.setColor(255/255, 255/255, 255/255)
 	love.graphics.setFont(_Debug.Font)
@@ -360,8 +383,8 @@ _Debug.keyConvert = function(key)
 			return
 		end
 		local liveflag,prevfile,prevmod
-		if string.find(_Debug.input,'_DebugSettings.LiveFile') then -- Saving previouse live data if changed.
-			prevfile = _DebugSettings.LiveFile
+		if string.find(_Debug.input,'_DebugInterface.LiveFile') then -- Saving previouse live data if changed.
+			prevfile = _DebugInterface.LiveFile
 			prevmod = _Debug.liveLastModified
 			liveflag=true
 		end
@@ -394,23 +417,23 @@ _Debug.keyConvert = function(key)
 		--
 		
 		if liveflag then -- Setting up lastModified for the new live file(s) if changed
-			if type(_DebugSettings.LiveFile) == 'table' then
+			if type(_DebugInterface.LiveFile) == 'table' then
 				_Debug.liveLastModified={}
-				for i = 1, #_DebugSettings.LiveFile do --Setting up lastModified for live files
-					if not love.filesystem.exists(_DebugSettings.LiveFile[i]) then --if the file's not found then the live variables are reset
-						_Debug.handleError('_DebugSettings.LiveFile: Index '..i..' file "'.._DebugSettings.LiveFile[i]..'" was not found.')
-						_DebugSettings.LiveFile = prevfile
+				for i = 1, #_DebugInterface.LiveFile do --Setting up lastModified for live files
+					if not love.filesystem.exists(_DebugInterface.LiveFile[i]) then --if the file's not found then the live variables are reset
+						_Debug.handleError('_DebugInterface.LiveFile: Index '..i..' file "'.._DebugInterface.LiveFile[i]..'" was not found.')
+						_DebugInterface.LiveFile = prevfile
 						_Debug.liveLastModified = prevmod
 						return
 					end
-					_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugSettings.LiveFile[i]).modtime
+					_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugInterface.LiveFile[i]).modtime
 				end
 			else
-				if love.filesystem.exists(_DebugSettings.LiveFile) then
-					_Debug.liveLastModified = love.filesystem.getInfo(_DebugSettings.LiveFile).modtime
+				if love.filesystem.exists(_DebugInterface.LiveFile) then
+					_Debug.liveLastModified = love.filesystem.getInfo(_DebugInterface.LiveFile).modtime
 				else
-					_Debug.handleError('_DebugSettings.LiveFile: File "'.._DebugSettings.LiveFile..'" was not found.')
-					_DebugSettings.LiveFile = prevfile
+					_Debug.handleError('_DebugInterface.LiveFile: File "'.._DebugInterface.LiveFile..'" was not found.')
+					_DebugInterface.LiveFile = prevfile
 					_Debug.liveLastModified = prevmod
 				end
 			end
@@ -590,14 +613,14 @@ end
 
 --Reloads the Code, update() and load()
 _Debug.hotSwapUpdate = function(dt,file)
-	local file = file or _DebugSettings.LiveFile
+	local file = file or _DebugInterface.LiveFile
 	local output, ok, err, loadok, updateok
 	local success, chunk = pcall(love.filesystem.load, file)
 	if not success then
-        _Debug.handleError(tostring(chunk))
+				_Debug.handleError(tostring(chunk))
 		output = chunk .. '\n'
-    end
-    ok,err = xpcall(chunk, _Debug.handleError)
+		end
+		ok,err = xpcall(chunk, _Debug.handleError)
 	
 	if ok then
 		print("'"..file.."' Reloaded.")
@@ -744,66 +767,66 @@ _G["love"].run = function()
 						end
 					end
 				end
-            	
-            	-- Call love.update() if we are not to halt program execution
-            	if _DebugSettings.HaltExecution == false then
-                	xpcall(function() love.update(dt) end, _Debug.handleError)
-            	end
-            	
-            	-- Auto scroll the console if AutoScroll == true
-            	if _DebugSettings.AutoScroll == true then
-                	if _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
-                    	_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
-                	end
-            	end
+
+				-- Call love.update() if we are not to halt program execution
+				if _DebugInterface.HaltExecution == false then
+						xpcall(function() love.update(dt) end, _Debug.handleError)
+				end
+
+				-- Auto scroll the console if AutoScroll == true
+				if _DebugInterface.AutoScroll == true then
+						if _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
+								_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
+						end
+				end
 			end
-			
+
 			if love.update and not _Debug.drawOverlay then
-				if _DebugSettings.LiveAuto and _Debug.liveCheckLastModified(_DebugSettings.LiveFile,_Debug.liveLastModified) then
-					if type(_DebugSettings.LiveFile) == 'table' then
-						for i=1,#_DebugSettings.LiveFile do
-							if love.filesystem.getInfo(_DebugSettings.LiveFile[i]).modtime ~= _Debug.liveLastModified[i] then
-								_Debug.hotSwapUpdate(dt,_DebugSettings.LiveFile[i])
-								_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugSettings.LiveFile[i]).modtime
+				if _DebugInterface.LiveAuto and _Debug.liveCheckLastModified(_DebugInterface.LiveFile,_Debug.liveLastModified) then
+					if type(_DebugInterface.LiveFile) == 'table' then
+						for i=1,#_DebugInterface.LiveFile do
+							if love.filesystem.getInfo(_DebugInterface.LiveFile[i]).modtime ~= _Debug.liveLastModified[i] then
+								_Debug.hotSwapUpdate(dt,_DebugInterface.LiveFile[i])
+								_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugInterface.LiveFile[i]).modtime
 							end
 						end
-						if _DebugSettings.LiveReset then
+						if _DebugInterface.LiveReset then
 							_Debug.hotSwapLoad()
 						end
 					else
-						_Debug.hotSwapUpdate(dt,_DebugSettings.LiveFile)
-						_Debug.liveLastModified = love.filesystem.getInfo(_DebugSettings.LiveFile).modtime
-						if _DebugSettings.LiveReset then
+						_Debug.hotSwapUpdate(dt,_DebugInterface.LiveFile)
+						_Debug.liveLastModified = love.filesystem.getInfo(_DebugInterface.LiveFile).modtime
+						if _DebugInterface.LiveReset then
 							_Debug.hotSwapLoad()
 						end
 					end
 				else
 					xpcall(function() love.update(dt) end, _Debug.handleError)
 				end
-			elseif love.update and (_Debug.liveDo or (_DebugSettings.LiveAuto and _Debug.liveCheckLastModified(_DebugSettings.LiveFile,_Debug.liveLastModified))) then
-				if type(_DebugSettings.LiveFile) == 'table' then
-					for i=1,#_DebugSettings.LiveFile do
-						if (_DebugSettings.LiveAuto and love.filesystem.getInfo(_DebugSettings.LiveFile[i]) ~= _Debug.liveLastModified[i]) or _Debug.liveDo then
-							_Debug.hotSwapUpdate(dt,_DebugSettings.LiveFile[i])
-							_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugSettings.LiveFile[i]).modtime
+			elseif love.update and (_Debug.liveDo or (_DebugInterface.LiveAuto and _Debug.liveCheckLastModified(_DebugInterface.LiveFile,_Debug.liveLastModified))) then
+				if type(_DebugInterface.LiveFile) == 'table' then
+					for i=1,#_DebugInterface.LiveFile do
+						if (_DebugInterface.LiveAuto and love.filesystem.getInfo(_DebugInterface.LiveFile[i]) ~= _Debug.liveLastModified[i]) or _Debug.liveDo then
+							_Debug.hotSwapUpdate(dt,_DebugInterface.LiveFile[i])
+							_Debug.liveLastModified[i] = love.filesystem.getInfo(_DebugInterface.LiveFile[i]).modtime
 						end
 					end
-					if _DebugSettings.LiveReset then
+					if _DebugInterface.LiveReset then
 						_Debug.hotSwapLoad()
 					end
 				else
-					_Debug.hotSwapUpdate(dt,_DebugSettings.LiveFile)
-					if _DebugSettings.LiveReset then
+					_Debug.hotSwapUpdate(dt,_DebugInterface.LiveFile)
+					if _DebugInterface.LiveReset then
 						_Debug.hotSwapLoad()
 					end
-					_Debug.liveLastModified = love.filesystem.getInfo(_DebugSettings.LiveFile).modtime
+					_Debug.liveLastModified = love.filesystem.getInfo(_DebugInterface.LiveFile).modtime
 				end
 			end -- will pass 0 if love.timer is disabled
 			if love.graphics and love.graphics.isActive() then
 				love.graphics.clear(love.graphics.getBackgroundColor())
 				love.graphics.origin()
 				if love.draw then if _Debug.liveDo then _Debug.hotSwapDraw() _Debug.liveDo=false end xpcall(love.draw, _Debug.handleError) end
-				if _DebugSettings.DrawOnTop then _Debug.onTop() end
+				if _DebugInterface.DrawOnTop then _Debug.onTop() end
 				if _Debug.drawOverlay then _Debug.overlay() end
 				love.graphics.present()
 			end

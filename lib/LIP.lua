@@ -29,10 +29,10 @@ local LIP = {};
 --@param fileName The name of the INI file to parse. [string]
 --@return The table containing all data from the INI file. [table]
 function LIP.load(fileName)
-  if (type(fileName) ~= 'string') then log.warn('Parameter "fileName" must be a string.'); end;
-  if (love.filesystem.getInfo(fileName) == nil) then log.error('Error loading file: ' .. fileName); return {}; end;
+	if (type(fileName) ~= 'string') then log.warn('Parameter "fileName" must be a string.'); end;
+	if (love.filesystem.getInfo(fileName) == nil) then log.error('Error loading file: ' .. fileName); return {}; end;
 
-  local data = {};
+	local data = {};
 	local section;
 	for line in love.filesystem.lines(fileName) do
 		local tempSection = line:match('^%[([^%[%]]+)%]$');
@@ -65,29 +65,29 @@ end
 function LIP.save(fileName, data, tweakableOnly)
 	if (type(fileName) ~= 'string') then return false, 'Parameter "fileName" must be a string.'; end;
 	if (type(data) ~= 'table') then return false, 'Parameter "data" must be a table.'; end;
-  if (type(tweakableOnly) ~= 'boolean') then return false, 'Parameter "tweakableOnly" must be boolean.'; end;
+	if (type(tweakableOnly) ~= 'boolean') then return false, 'Parameter "tweakableOnly" must be boolean.'; end;
 	local contents = '';
 	for section, param in pairs(data) do
-    if (not tweakableOnly or param['_tweakable'] ~= nil) then
-      contents = contents .. ('[%s]\n'):format(section);
+		if (not tweakableOnly or param['_tweakable'] ~= nil) then
+			contents = contents .. ('[%s]\n'):format(section);
 
-      if (tweakableOnly) then
-        for _, key in pairs(param['_tweakable']) do
-          if param[key] ~= nil then
-            contents = contents .. ('%s=%s\n'):format(key, tostring(param[key]));
-          end
-        end
-      else
-        for key, value in pairs(param) do
-          contents = contents .. ('%s=%s\n'):format(key, tostring(value));
-        end
-      end
+			if (tweakableOnly) then
+				for _, key in pairs(param['_tweakable']) do
+					if param[key] ~= nil then
+						contents = contents .. ('%s=%s\n'):format(key, tostring(param[key]));
+					end
+				end
+			else
+				for key, value in pairs(param) do
+					contents = contents .. ('%s=%s\n'):format(key, tostring(value));
+				end
+			end
 
-      contents = contents .. '\n';
-    end
+			contents = contents .. '\n';
+		end
 	end
 
-  return love.filesystem.write(fileName, contents)
+	return love.filesystem.write(fileName, contents)
 end
 
 return LIP;
