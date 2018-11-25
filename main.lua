@@ -6,18 +6,15 @@ require("states/StartSequence")
 -- Include required modules
 require("modules/mInputVerify")
 require("modules/mPersistence")
-require("modules/mLuna")
-
-
-luna = Luna()
+luna = require("modules/mLuna")
 
 function love.load()
-  -- Debug Mode
-  if arg[#arg] == "-debug" then
-    require("states/Debug")
-    addState(DebugMode, "Debug", 10)
-    enableState("Debug")
-  end
+	-- Debug Mode
+	if arg[#arg] == "-debug" then
+		require("states/Debug")
+		addState(DebugMode, "Debug", 10)
+		enableState("Debug")
+	end
 
 	-- Add the game states for future use
 	addState(StartSequence, "StartSequence")
@@ -25,11 +22,11 @@ function love.load()
 	-- Initial game state
 	enableState("StartSequence")
 
-  -- Load settings.cfg
-  Persistence:loadSettings()
+	-- Load settings.cfg
+	Persistence:loadSettings()
 
-  -- Update video with the players settings
-  luna:updateVideo()
+	-- Update video with the players settings
+	luna:updateVideo()
 end
 
 function love.update(dt)
@@ -58,6 +55,6 @@ function love.mousereleased(x, y, button)
 end
 
 function love.quit()
-  Persistence:saveSettings()
-  return false
+	Persistence:saveSettings()
+	return false
 end
