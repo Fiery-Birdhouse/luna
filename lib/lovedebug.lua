@@ -359,7 +359,9 @@ _Debug.keyConvert = function(key)
 		if _Debug.inputMarker == 0 then --Keep the input from copying itself
 			suffix = ""
 		end
+
 		_Debug.input = _Debug.input:sub(1, _Debug.inputMarker - 1) .. suffix
+
 		if _Debug.inputMarker > 0 then
 			_Debug.inputMarker = _Debug.inputMarker - 1
 			_Debug.tick = 0
@@ -368,7 +370,8 @@ _Debug.keyConvert = function(key)
 	elseif key == "delete" then
 		local suffix = _Debug.input:sub(_Debug.inputMarker + 2, #_Debug.input)
 		_Debug.input = _Debug.input:sub(1, _Debug.inputMarker) .. suffix
-		if _Debug.inputMarker > 0 then
+
+		if _Debug.inputMarker < #_Debug.input then
 			_Debug.tick = 0
 			_Debug.drawTick = false
 		end
@@ -546,6 +549,25 @@ _Debug.handleKey = function(a)
 				return
 			elseif  a:lower()=='l' then
 				_Debug.clear()
+				return
+			elseif  a:lower()=='a' then
+				_Debug.inputMarker = 0
+				_Debug.tick = 0
+				_Debug.drawTick = false
+				return
+			elseif  a:lower()=='e' then
+				_Debug.inputMarker = #_Debug.input
+				_Debug.tick = 0
+				_Debug.drawTick = false
+				return
+			elseif  a:lower()=='u' then
+				love.system.setClipboardText(_Debug.input:sub(1, _Debug.inputMarker))
+				_Debug.input = _Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input)
+				_Debug.inputMarker = 0
+				return
+			elseif  a:lower()=='k' then
+				love.system.setClipboardText(_Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input))
+				_Debug.input = _Debug.input:sub(1, _Debug.inputMarker)
 				return
 			else
 				_Debug.handleVirtualKey(a)
@@ -728,7 +750,12 @@ _G["love"].run = function()
 					if name == "keypressed" then --Keypress
 						skipEvent = true
 						
-						if string.len(a)>=2 or (love.keyboard.isDown('lctrl') and (a == 'c' or a == 'v' or a == 'l')) then _Debug.handleKey(a) end
+						if string.len(a)>=2
+							or (love.keyboard.isDown('lctrl')
+							and (a == 'c' or a == 'v' or a == 'l' or a == 'a' or a == 'e' or a == 'u' or a == 'k'))
+						then
+							_Debug.handleKey(a)
+						end
 						if not _Debug.drawOverlay then
 							if love.keypressed then love.keypressed(a,b) end
 						end
