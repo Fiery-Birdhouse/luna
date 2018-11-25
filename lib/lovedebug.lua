@@ -178,7 +178,9 @@ _Debug.onTop = function()
 		love.graphics.rectangle('fill',love.graphics.getWidth()/2,1,love.graphics.getWidth()/2,2+ 5*((#e-1) > -1 and #e-1 or 0) + #e*_Debug.Font:getHeight())
 		love.graphics.setColor(255/255, 255/255, 255/255, 255/255)
 		for i,v in ipairs(e) do
-			love.graphics.print(v[1], love.graphics.getWidth()/2+5, 2+ 5*(i-1) + (i-1)*_Debug.Font:getHeight())
+			if type(v[1]) == "string" then
+				love.graphics.print(v[1], love.graphics.getWidth()/2+5, 2+ 5*(i-1) + (i-1)*_Debug.Font:getHeight())
+			end
 		end
 	end
 	love.graphics.setScissor()
@@ -366,20 +368,8 @@ _Debug.keyConvert = function(key)
 	elseif key == 'f5' then
 		_Debug.liveDo=true
 	elseif key == "return" then 
-		if _Debug.input == 'clear' then --Clears the console
-			_Debug.history[#_Debug.history] = _Debug.input
-			table.insert(_Debug.history, '')
-			_Debug.historyIndex = #_Debug.history
-			_Debug.errors = {}
-			_Debug.prints = {}
-			_Debug.order = {}
-			_Debug.orderOffset = 0
-			_Debug.longestOffset = 0
-			_Debug.lastH = nil
-			_Debug.lastCut = nil
-			_Debug.lastRows = 1
-			_Debug.input = ""
-			_Debug.inputMarker = 0
+		if _Debug.input == 'clear' then --Clear the console
+			_Debug.clear()
 			return
 		end
 		local liveflag,prevfile,prevmod
@@ -540,13 +530,17 @@ _Debug.handleKey = function(a)
 	elseif _Debug.drawOverlay then
 		if love.keyboard.isDown('lctrl') then
 			if a:lower()=='v' and #love.system.getClipboardText()>0 then
-				 local clipboard=love.system.getClipboardText()
-				 local text={}
-				 for char in string.gmatch(clipboard,".") do text[#text+1]=char end
-				 _Debug.handleVirtualKey(text)
+				local clipboard=love.system.getClipboardText()
+				local text={}
+				for char in string.gmatch(clipboard,".") do text[#text+1]=char end
+				_Debug.handleVirtualKey(text)
 			elseif a:lower()=='c' then
-				 love.system.setClipboardText(_Debug.input)
-				 return
+				love.system.setClipboardText(_Debug.input)
+				return
+			elseif  a:lower()=='l' then
+				log.trace("L key pressed")
+				_Debug.clear()
+				return
 			else
 				_Debug.handleVirtualKey(a)
 				if not _Debug.trackKeys[a] then
@@ -665,8 +659,23 @@ _Debug.liveCheckLastModified = function(table1,table2)
 	end
 	return false
 end
-	
-	
+
+_Debug.clear = function ()
+	_Debug.history[#_Debug.history] = _Debug.input
+	table.insert(_Debug.history, '')
+	_Debug.historyIndex = #_Debug.history
+	_Debug.errors = {}
+	_Debug.prints = {}
+	_Debug.order = {}
+	_Debug.orderOffset = 0
+	_Debug.longestOffset = 0
+	_Debug.lastH = nil
+	_Debug.lastCut = nil
+	_Debug.lastRows = 1
+	_Debug.input = ""
+	_Debug.inputMarker = 0
+	return
+end
 
 --Modded version of original love.run
 _G["love"].run = function()
@@ -713,7 +722,7 @@ _G["love"].run = function()
 					if name == "keypressed" then --Keypress
 						skipEvent = true
 						
-						if string.len(a)>=2 or (love.keyboard.isDown('lctrl') and (a == 'c' or a == 'v')) then _Debug.handleKey(a) end
+						if string.len(a)>=2 or (love.keyboard.isDown('lctrl') and (a == 'c' or a == 'v' or a == 'l')) then _Debug.handleKey(a) end
 						if not _Debug.drawOverlay then
 							if love.keypressed then love.keypressed(a,b) end
 						end
