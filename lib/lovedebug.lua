@@ -11,6 +11,7 @@ local _Debug = {
 	tickTime = 0.5,
 	tick = 0.5,
 	drawTick = true,
+	consoleIsReady = false,
 
 	input = "",
 	inputMarker = 0,
@@ -68,6 +69,10 @@ end
 
 local super_print = print
 
+_DebugInterface.openConsole = function ()
+	_Debug.consoleIsReady = true
+end
+
 --Handle log input
 _DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgb)
 	super_print(
@@ -106,6 +111,12 @@ _G["print"] = function(...)
 	table.insert(_Debug.prints, table.concat(str, "       "))
 	table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
 	table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
+end
+
+_Debug.toggleConsole = function ()
+	if love.system.getOS()~='Android' then
+		_Debug.drawOverlay = not _Debug.drawOverlay
+	end
 end
 
 --Error catcher
@@ -532,55 +543,44 @@ end
 
 --Handle Keypresses
 _Debug.handleKey = function(a)
-	local activekey = love.system.getOS()~='Android' and (_lovedebugpresskey or "'") or 'menu'
-	if a == activekey then
-		--if love.keyboard.isDown("lshift", "rshift", "lctrl", "rctrl") then --Support for both Shift and CTRL
-			_Debug.drawOverlay = not _Debug.drawOverlay --Toggle
-		--end
-	elseif _Debug.drawOverlay then
-		if love.keyboard.isDown('lctrl') then
-			if a:lower()=='v' and #love.system.getClipboardText()>0 then
-				local clipboard=love.system.getClipboardText()
-				local text={}
-				for char in string.gmatch(clipboard,".") do text[#text+1]=char end
-				_Debug.handleVirtualKey(text)
-			elseif a:lower()=='c' then
-				love.system.setClipboardText(_Debug.input)
-				return
-			elseif  a:lower()=='l' then
-				_Debug.clear()
-				return
-			elseif  a:lower()=='a' then
-				_Debug.inputMarker = 0
-				_Debug.tick = 0
-				_Debug.drawTick = false
-				return
-			elseif  a:lower()=='e' then
-				_Debug.inputMarker = #_Debug.input
-				_Debug.tick = 0
-				_Debug.drawTick = false
-				return
-			elseif  a:lower()=='u' then
-				love.system.setClipboardText(_Debug.input:sub(1, _Debug.inputMarker))
-				_Debug.input = _Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input)
-				_Debug.inputMarker = 0
-				return
-			elseif  a:lower()=='k' then
-				love.system.setClipboardText(_Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input))
-				_Debug.input = _Debug.input:sub(1, _Debug.inputMarker)
-				return
-			else
-				_Debug.handleVirtualKey(a)
-				if not _Debug.trackKeys[a] then
-					_Debug.trackKeys[a] = { time = _Debug.keyRepeatInterval - _Debug.keyRepeatDelay}
-				end
-			end
-		else
-			_Debug.handleVirtualKey(a)
-			if not _Debug.trackKeys[a] then
-				_Debug.trackKeys[a] = { time = _Debug.keyRepeatInterval - _Debug.keyRepeatDelay}
-			end
+	if love.keyboard.isDown('lctrl') then
+		if a:lower()=='v' and #love.system.getClipboardText()>0 then
+			local clipboard=love.system.getClipboardText()
+			local text={}
+			for char in string.gmatch(clipboard,".") do text[#text+1]=char end
+			_Debug.handleVirtualKey(text)
+			return
+		elseif a:lower()=='c' then
+			love.system.setClipboardText(_Debug.input)
+			return
+		elseif  a:lower()=='l' then
+			_Debug.clear()
+			return
+		elseif  a:lower()=='a' then
+			_Debug.inputMarker = 0
+			_Debug.tick = 0
+			_Debug.drawTick = false
+			return
+		elseif  a:lower()=='e' then
+			_Debug.inputMarker = #_Debug.input
+			_Debug.tick = 0
+			_Debug.drawTick = false
+			return
+		elseif  a:lower()=='u' then
+			love.system.setClipboardText(_Debug.input:sub(1, _Debug.inputMarker))
+			_Debug.input = _Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input)
+			_Debug.inputMarker = 0
+			return
+		elseif  a:lower()=='k' then
+			love.system.setClipboardText(_Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input))
+			_Debug.input = _Debug.input:sub(1, _Debug.inputMarker)
+			return
 		end
+	end
+
+	_Debug.handleVirtualKey(a)
+	if not _Debug.trackKeys[a] then
+		_Debug.trackKeys[a] = { time = _Debug.keyRepeatInterval - _Debug.keyRepeatDelay}
 	end
 end
 
@@ -742,21 +742,24 @@ _G["love"].run = function()
 					local skipEvent = false
 					if name == "textinput" then --Keypress
 						skipEvent = true
-						_Debug.handleKey(a)
-						if not _Debug.drawOverlay then
+						if _Debug.drawOverlay then
+							_Debug.handleKey(a)
+						else
 							if love.textinput then love.textinput(a) end
 						end
 					end
-					if name == "keypressed" then --Keypress
+					if name == "keypressed" then -- Keypress
 						skipEvent = true
-						
-						if string.len(a)>=2
-							or (love.keyboard.isDown('lctrl')
-							and (a == 'c' or a == 'v' or a == 'l' or a == 'a' or a == 'e' or a == 'u' or a == 'k'))
-						then
-							_Debug.handleKey(a)
-						end
-						if not _Debug.drawOverlay then
+						if (_Debug.drawOverlay) then -- Keys pressed while the console is opened
+							if (a == 'escape') then
+								_Debug.toggleConsole()
+							elseif string.len(a)>=2
+								or (love.keyboard.isDown('lctrl')
+								and (a == 'c' or a == 'v' or a == 'l' or a == 'a' or a == 'e' or a == 'u' or a == 'k')) -- Shortcuts
+							then
+								_Debug.handleKey(a)
+							end
+						else
 							if love.keypressed then love.keypressed(a,b) end
 						end
 					end
@@ -795,7 +798,7 @@ _G["love"].run = function()
 								_Debug.handleVirtualKey(key)
 							end
 						else
-						 	_Debug.trackKeys[key] = nil
+							_Debug.trackKeys[key] = nil
 						end
 				 	else
 						if love.keyboard.isDown('v') and love.keyboard.isDown('lctrl') then
@@ -824,6 +827,11 @@ _G["love"].run = function()
 			end
 
 			if love.update and not _Debug.drawOverlay then
+				if _Debug.consoleIsReady then
+					_Debug.drawOverlay = true
+					_Debug.consoleIsReady = false
+				end
+
 				if _DebugInterface.LiveAuto and _Debug.liveCheckLastModified(_DebugInterface.LiveFile,_Debug.liveLastModified) then
 					if type(_DebugInterface.LiveFile) == 'table' then
 						for i=1,#_DebugInterface.LiveFile do
