@@ -1,7 +1,10 @@
 -- Translate Löve inputs into valid engine commands
 class.InputVerify()
 
-commandList = {}
+commandList = {
+	["'"] = "console"
+}
+
 holdingKeys = {}
 
 function InputVerify:keypressed(key)
