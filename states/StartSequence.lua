@@ -16,4 +16,7 @@ function StartSequence:draw()
 end
 
 function StartSequence:keypressed(key)
+	if key == "console" then
+			_DebugInterface.openConsole()
+	end
 end
