@@ -14,7 +14,7 @@ Luna.settings = {
 		w = videoW,
 		h = videoH,
 		vsync = true,
-		fullscreen = false
+		fullscreen = true
 	}
 }
 
