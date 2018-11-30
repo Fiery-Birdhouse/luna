@@ -22,8 +22,9 @@ function love.load()
 	-- Initial game state
 	enableState("StartSequence")
 
-	-- Load settings.cfg
+	-- Load the player .cfg files
 	Persistence:loadSettings()
+	Persistence:loadControls()
 
 	-- Update video with the players settings
 	luna:updateVideo()
@@ -55,6 +56,7 @@ function love.mousereleased(x, y, button)
 end
 
 function love.quit()
-	Persistence:saveSettings()
+	Persistence:saveINI() -- luna.settings -> settings.cfg
+	Persistence:saveINI(InputVerify.commandList, 'controls.cfg', false)
 	return false
 end
