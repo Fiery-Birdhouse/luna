@@ -1,28 +1,30 @@
 -- Translate Löve inputs into valid engine commands
 class.InputVerify()
 
-commandList = {
-	["'"] = "console"
+InputVerify.commandList = {
+	keyboard = {
+		["'"] = "console"
+	}
 }
 
-holdingKeys = {}
+InputVerify.holdingKeys = {}
 
 function InputVerify:keypressed(key)
-	if commandList[key] ~= nil then
-		holdingKeys[key] = commandList[key]
-		lovelyMoon.keypressed(commandList[key])
+	if self.commandList.keyboard[key] ~= nil then
+		self.holdingKeys[key] = self.commandList.keyboard[key]
+		lovelyMoon.keypressed(self.commandList.keyboard[key])
 	end
 end
 
 function InputVerify:keyreleased(key)
-	if commandList[key] ~= nil then
-		holdingKeys[key] = nil
-		lovelyMoon.keyreleased(commandList[key])
+	if self.commandList.keyboard[key] ~= nil then
+		self.holdingKeys[key] = nil
+		lovelyMoon.keyreleased(self.commandList.keyboard[key])
 	end
 end
 
 function InputVerify:update(key)
-	for key, command in pairs(holdingKeys) do
+	for key, command in pairs(self.holdingKeys) do
 		lovelyMoon.keyhold(command)
 	end
 end
