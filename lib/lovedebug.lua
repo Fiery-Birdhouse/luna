@@ -30,6 +30,15 @@ local _Debug = {
 	Proposal_String = "",
 
 	trackKeys = {},
+	trackableKeys = {
+		['backspace'] = true,
+		['delete'] = true,
+		['return'] = true,
+		['left'] = true,
+		['right'] = true,
+		['up'] = true,
+		['down'] = true
+	},
 	keyRepeatInterval = 0.05,
 	keyRepeatDelay = 0.4,
 
@@ -312,7 +321,7 @@ _Debug.handleMouse = function(a, b, c)
 		_Debug.orderOffset = _Debug.orderOffset - 1
 	end
 	if c == "m" and love.keyboard.isDown('lctrl') and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
-		 _Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
+		_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
 	end
 end
 
@@ -405,7 +414,7 @@ _Debug.keyConvert = function(key)
 		_Debug.history[#_Debug.history] = _Debug.input
 		table.insert(_Debug.history, '')
 		_Debug.historyIndex = #_Debug.history
-	 
+
 		local f, err = loadstring(_Debug.input)
 		if f then
 			--f = xpcall(f,_Debug.handleError)
@@ -570,6 +579,7 @@ _Debug.handleKey = function(a)
 			love.system.setClipboardText(_Debug.input:sub(1, _Debug.inputMarker))
 			_Debug.input = _Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input)
 			_Debug.inputMarker = 0
+			_Debug.updateProposals({})
 			return
 		elseif  a:lower()=='k' then
 			love.system.setClipboardText(_Debug.input:sub(_Debug.inputMarker + 1, #_Debug.input))
@@ -579,29 +589,29 @@ _Debug.handleKey = function(a)
 	end
 
 	_Debug.handleVirtualKey(a)
-	if not _Debug.trackKeys[a] then
+	if not _Debug.trackKeys[a] and _Debug.trackableKeys[a] then
 		_Debug.trackKeys[a] = { time = _Debug.keyRepeatInterval - _Debug.keyRepeatDelay}
 	end
 end
 
 --Handle Virtual Keypresses
 _Debug.handleVirtualKey = function(a)
-	 if type(a) == 'string' then
+	if type(a) == 'string' then
 		_Debug.resetProposals = true
 		local add = _Debug.keyConvert(a) or '' --Needed for backspace, do NOT optimize
 		local suffix = _Debug.input:sub(_Debug.inputMarker, (#_Debug.input >= _Debug.inputMarker) and #_Debug.input or _Debug.inputMarker + 1)
 		if _Debug.inputMarker == 0 then --Keep the input from copying itself
-			 suffix = ""
+			suffix = ""
 		end
 		_Debug.input = _Debug.input:sub(0, _Debug.inputMarker - 1) .. add .. suffix
 		if _Debug.resetProposals then
-			 if _Debug.inputMarker == 0 or _Debug.input:sub(_Debug.inputMarker + 1, _Debug.inputMarker + 1):find('[0-9a-zA-Z_]') then
-				 _Debug.ProposalLocation = _G
-				 _Debug.Proposal_String = ''
-			 else
-				 _Debug.findLocation(_Debug.input:sub(1, _Debug.inputMarker))
-			 end
-			 _Debug.updateProposals(_Debug.ProposalLocation)
+			if _Debug.inputMarker == 0 or _Debug.input:sub(_Debug.inputMarker + 1, _Debug.inputMarker + 1):find('[0-9a-zA-Z_]') then
+				_Debug.ProposalLocation = _G
+				_Debug.Proposal_String = ''
+			else
+				_Debug.findLocation(_Debug.input:sub(1, _Debug.inputMarker))
+			end
+			_Debug.updateProposals(_Debug.ProposalLocation)
 		end
 	else
 		for i=1,#a do
@@ -611,7 +621,7 @@ _Debug.handleVirtualKey = function(a)
 			_Debug.drawTick = false
 			_Debug.handlePast(a[i])
 		end
-		if not _Debug.trackKeys[a] then
+		if not _Debug.trackKeys[a] and _Debug.trackableKeys[a] then
 			_Debug.trackKeys[a] = { time = _Debug.keyRepeatInterval - _Debug.keyRepeatDelay}
 		end
 	end
@@ -800,7 +810,7 @@ _G["love"].run = function()
 						else
 							_Debug.trackKeys[key] = nil
 						end
-				 	else
+					else
 						if love.keyboard.isDown('v') and love.keyboard.isDown('lctrl') then
 							d.time = d.time + dt
 							if d.time >= _Debug.keyRepeatInterval then
@@ -808,7 +818,7 @@ _G["love"].run = function()
 								_Debug.handleVirtualKey(key)
 							end
 						else
-						 	_Debug.trackKeys[key] = nil
+							_Debug.trackKeys[key] = nil
 						end
 					end
 				end
