@@ -15,12 +15,12 @@ log.level = "trace"
 
 
 local modes = {
-	{ name = "trace", termColor = "\27[34m", rgb = {1, 1, 1, 1}},
-	{ name = "debug", termColor = "\27[36m", rgb = {1, 1, 1, 1}},
-	{ name = "info",  termColor = "\27[32m", rgb = {1, 1, 1, 1}},
-	{ name = "warn",  termColor = "\27[33m", rgb = {1, 1, 1, 1}},
-	{ name = "error", termColor = "\27[31m", rgb = {1, 1, 1, 1}},
-	{ name = "fatal", termColor = "\27[35m", rgb = {1, 1, 1, 1}},
+	{ name = "trace", termColor = "\27[34m", rgba = {52/255, 101/255, 164/255, 1}},
+	{ name = "debug", termColor = "\27[36m", rgba = {6/255, 152/255, 154/255, 1}},
+	{ name = "info",  termColor = "\27[32m", rgba = {78/255, 154/255, 6/255, 1}},
+	{ name = "warn",  termColor = "\27[33m", rgba = {196/255, 160/255, 0, 1}},
+	{ name = "error", termColor = "\27[31m", rgba = {204/255, 0, 0, 1}},
+	{ name = "fatal", termColor = "\27[35m", rgba = {117/255, 80/255, 123/255, 1}},
 }
 
 
@@ -71,7 +71,7 @@ for i, x in ipairs(modes) do
 			nameupper,
 			os.date("%H:%M:%S"),
 			log.usecolor and x.termColor,
-			log.usecolor and x.rgb
+			log.usecolor and x.rgba
 		)
 
 		-- Output to log file
