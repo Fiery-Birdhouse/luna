@@ -7,6 +7,7 @@ tiny = require("lib/tiny")
 log = require("lib/log")
 pd = pretty.dump
 pw = pretty.write
+stringx.import()
 
 -- Luna specific config
 log.level = "error"
