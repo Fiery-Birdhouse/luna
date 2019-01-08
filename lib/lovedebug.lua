@@ -83,7 +83,9 @@ _DebugInterface.openConsole = function ()
 end
 
 --Handle log input
-_DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgb)
+_DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgba)
+	local R, G, B, A = love.graphics.getColor()
+
 	super_print(
 		string.format(
 			"%s[%-6s%s]%s %s: %s",
@@ -97,13 +99,12 @@ _DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgb)
 	)
 
 	table.insert(_Debug.prints, 
-		string.format(
-			"[%-6s%s] %s: %s",
-			modeName,
-			time,
-			lineinfo,
-			msg
-		)
+		{
+			rgba,
+			string.format("[%-6s%s]", modeName, time),
+			{R, G, B, A},
+			string.format(" %s: %s", lineinfo, msg),
+		}
 	)
 
 	table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
@@ -137,6 +138,11 @@ _Debug.handleError = function(err)
 			end
 		end
 	end
+
+	super_print(
+		string.format("%s%s%s", "\27[31m", err, "\27[0m")
+	)
+
 	table.insert(_Debug.errors, err)
 	table.insert(_Debug.order, "e" .. tostring(#_Debug.errors))
 	table.insert(_Debug.onTopFeed, {"e" .. tostring(#_Debug.errors),0})
