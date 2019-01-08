@@ -98,17 +98,18 @@ _DebugInterface.log = function(msg, lineinfo, modeName, time, color, rgba)
 		)
 	)
 
-	table.insert(_Debug.prints, 
-		{
-			rgba,
-			string.format("[%-6s%s]", modeName, time),
-			{R, G, B, A},
-			string.format(" %s: %s", lineinfo, msg),
-		}
-	)
+	msg = msg:splitlines()
 
-	table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
-	table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
+	_Debug.addLine({
+		rgba,
+		string.format("[%-6s%s]", modeName, time),
+		{R, G, B, A},
+		string.format(" %s: %s", lineinfo, table.remove(msg, 1))
+	}, false)
+
+	for i, line in ipairs(msg) do
+		_Debug.addLine(line, false)
+	end
 end
 
 --Override print and call super
@@ -116,11 +117,12 @@ _G["print"] = function(...)
 	super_print(...)
 	local str = {}
 	for i = 1, select('#', ...) do
-		str[i] = tostring(select(i, ...))
+		msg = tostring(select(i, ...)):splitlines()
+
+		for j, line in ipairs(msg) do
+			_Debug.addLine(line, false)
+		end
 	end
-	table.insert(_Debug.prints, table.concat(str, "       "))
-	table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
-	table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
 end
 
 _Debug.toggleConsole = function ()
@@ -143,11 +145,8 @@ _Debug.handleError = function(err)
 		string.format("%s%s%s", "\27[31m", err, "\27[0m")
 	)
 
-	table.insert(_Debug.errors, err)
-	table.insert(_Debug.order, "e" .. tostring(#_Debug.errors))
-	table.insert(_Debug.onTopFeed, {"e" .. tostring(#_Debug.errors),0})
+	_Debug.addLine(err, true)
 end
-
 
 --Get Linetype
 _Debug.lineInfo = function(str)
@@ -157,6 +156,18 @@ _Debug.lineInfo = function(str)
 	return err, index
 end
 
+--Add a new line to the list of output
+_Debug.addLine = function(value, err)
+	if (err) then
+		table.insert(_Debug.errors, value)
+		table.insert(_Debug.order, "e" .. tostring(#_Debug.errors))
+		table.insert(_Debug.onTopFeed, {"e" .. tostring(#_Debug.errors),0})
+	else
+		table.insert(_Debug.prints, value)
+		table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
+		table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
+	end
+end
 
 --On Top drawer
 _Debug.onTop = function()
