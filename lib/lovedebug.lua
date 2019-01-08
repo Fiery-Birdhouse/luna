@@ -58,7 +58,7 @@ _DebugInterface = {
 	LiveFile = 'main.lua',
 	LiveReset = false,
 	HaltExecution = true,
-	AutoScroll = false,
+	AutoScroll = true,
 }
 
 --Print all settings
@@ -167,6 +167,12 @@ _Debug.addLine = function(value, err)
 		table.insert(_Debug.order, "p" .. tostring(#_Debug.prints))
 		table.insert(_Debug.onTopFeed, {"p" .. tostring(#_Debug.prints),0})
 	end
+
+	if _DebugInterface.AutoScroll == true then
+			if _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
+					_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
+			end
+	end
 end
 
 --On Top drawer
@@ -203,7 +209,7 @@ _Debug.onTop = function()
 		love.graphics.rectangle('fill',0,1,love.graphics.getWidth()/2,2+ 5*((#p-1) > -1 and #p-1 or 0) + #p*_Debug.Font:getHeight())
 		love.graphics.setColor(255, 255, 255, 255)
 		for i,v in ipairs(p) do
-			if type(v[1]) == "string" then
+			if type(v[1]) == "string" or type(v[1]) == "table" then
 				love.graphics.print(v[1], 5, 2+ 5*(i-1) + (i-1)*_Debug.Font:getHeight())
 			end
 		end
@@ -215,7 +221,7 @@ _Debug.onTop = function()
 		love.graphics.rectangle('fill',love.graphics.getWidth()/2,1,love.graphics.getWidth()/2,2+ 5*((#e-1) > -1 and #e-1 or 0) + #e*_Debug.Font:getHeight())
 		love.graphics.setColor(255/255, 255/255, 255/255, 255/255)
 		for i,v in ipairs(e) do
-			if type(v[1]) == "string" then
+			if type(v[1]) == "string" or type(v[1]) == "table" then
 				love.graphics.print(v[1], love.graphics.getWidth()/2+5, 2+ 5*(i-1) + (i-1)*_Debug.Font:getHeight())
 			end
 		end
@@ -327,18 +333,23 @@ _Debug.overlay = function()
 end
 
 --Handle Mousepresses
-_Debug.handleMouse = function(a, b, c)
-	if c == "wd" and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
-		_Debug.orderOffset = _Debug.orderOffset + 1
-		if _Debug.orderOffset > _Debug.longestOffset then
-			_Debug.longestOffset = _Debug.orderOffset
+_Debug.handleMouse = function(a, b, c, event)
+	if event == "wheelmoved" then
+		if b < 0 and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
+			_Debug.orderOffset = _Debug.orderOffset + 1
+			if _Debug.orderOffset > _Debug.longestOffset then
+				_Debug.longestOffset = _Debug.orderOffset
+			end
 		end
-	end
-	if c == "wu" and _Debug.orderOffset > 0 then
-		_Debug.orderOffset = _Debug.orderOffset - 1
-	end
-	if c == "m" and love.keyboard.isDown('lctrl') and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
-		_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
+
+		if b > 0 and _Debug.orderOffset > 0 then
+			_Debug.orderOffset = _Debug.orderOffset - 1
+		end
+	elseif event == "mousepressed" then
+		log.info(c)
+		if c == 3 and love.keyboard.isDown('lctrl') and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
+			_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
+		end
 	end
 end
 
@@ -796,9 +807,9 @@ _G["love"].run = function()
 							if love.keyreleased then love.keyreleased(a, b) end
 						end
 					end
-					if name == "mousepressed" and _Debug.drawOverlay then --Mousepress
+					if name == "mousepressed" or name == "wheelmoved" and _Debug.drawOverlay then --Mousepress
 						skipEvent = true
-						_Debug.handleMouse(a, b, c)
+						_Debug.handleMouse(a, b, c, name)
 					end
 					if not skipEvent then
 						xpcall(function() love.handlers[name](a,b,c,d,e,f) end, _Debug.handleError)
@@ -843,13 +854,6 @@ _G["love"].run = function()
 				-- Call love.update() if we are not to halt program execution
 				if _DebugInterface.HaltExecution == false then
 						xpcall(function() love.update(dt) end, _Debug.handleError)
-				end
-
-				-- Auto scroll the console if AutoScroll == true
-				if _DebugInterface.AutoScroll == true then
-						if _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
-								_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
-						end
 				end
 			end
 
