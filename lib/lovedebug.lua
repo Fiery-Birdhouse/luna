@@ -61,21 +61,6 @@ _DebugInterface = {
 	AutoScroll = true,
 }
 
---Print all settings
-_DebugInterface.Settings = function()
-	print("Settings:")
-
-	print("   _DebugInterface.MultipleErrors  [Boolean]  Controls if errors should appear multiple times, default is false")
-	print("   _DebugInterface.OverlayColor  [{float, float, float, float}]  Sets the color of the overlay, default is {0,0,0,0.7}")
-	print("   _DebugInterface.LiveAuto  [Boolean]  Check if the code should be reloaded when it's modified, default is false")
-	print("   _DebugInterface.LiveFile  [String]  Sets the file that lovedebug reloads, default is 'main.lua'")
-	print("   _DebugInterface.LiveFile  [{String,String,...}]  Sets the files, has a table, that lovedebug reloads, can be multiple")
-	print("   _DebugInterface.LiveReset  [Boolean]  Rather or not love.load() should be reloaded if the code is HotSwapped, default is false")
-	print("   _DebugInterface.DrawOnTop  [Boolean]  If the errors and prints should be dispalyed on top of the screen, default is false")
-	print("   _DebugInterface.HaltExecution  [Boolean]  Rather or not to halt program execution while console is open, default is true")
-	print("   _DebugInterface.AutoScroll  [Boolean]  Rather or not to auto scroll the console once output fills up the console, default is false")
-end
-
 local super_print = print
 
 _DebugInterface.openConsole = function ()
@@ -346,7 +331,6 @@ _Debug.handleMouse = function(a, b, c, event)
 			_Debug.orderOffset = _Debug.orderOffset - 1
 		end
 	elseif event == "mousepressed" then
-		log.info(c)
 		if c == 3 and love.keyboard.isDown('lctrl') and _Debug.orderOffset < #_Debug.order - _Debug.lastRows + 1 then
 			_Debug.orderOffset = #_Debug.order - _Debug.lastRows + 1
 		end
