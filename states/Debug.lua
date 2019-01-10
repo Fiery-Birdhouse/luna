@@ -33,6 +33,10 @@ function DebugMode:update(dt)
 
 	fpsGraph.updateFPS(fpsInfo, dt)
 	fpsGraph.updateMem(memoryInfo, dt)
+
+	if (not luna.debugMode) then
+		disableState("Debug")
+	end
 end
 
 function DebugMode:draw()
@@ -46,4 +50,10 @@ function DebugMode:draw()
 	fpsGraph.drawGraphs({Info2})
 	love.graphics.setColor(255, 255, 87, 255)
 	fpsGraph.drawGraphs({Info3})
+end
+
+function DebugMode:keypressed(key)
+	if key == "console" then
+			_DebugInterface.openConsole()
+	end
 end
