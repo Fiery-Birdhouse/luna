@@ -1,5 +1,3 @@
-require("lib/lovedebug")
-
 -- Include all states
 require("states/StartSequence")
 
@@ -8,9 +6,14 @@ require("modules/mInputVerify")
 require("modules/mPersistence")
 luna = require("modules/mLuna")
 
+if tablex.find(arg, "-debug") then
+	luna.debugMode = true
+	require("lib/lovedebug")
+end
+
 function love.load()
 	-- Debug Mode
-	if arg[#arg] == "-debug" then
+	if luna.debugMode then
 		require("states/Debug")
 		addState(DebugMode, "Debug", 10)
 		enableState("Debug")
