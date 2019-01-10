@@ -26,6 +26,7 @@ function DebugMode:enable()
 end
 
 function DebugMode:disable()
+	log.info("Debug Mode [OFF]")
 end
 
 function DebugMode:update(dt)

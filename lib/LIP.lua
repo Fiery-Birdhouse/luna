@@ -29,7 +29,7 @@ local LIP = {};
 --@param fileName The name of the INI file to parse. [string]
 --@return The table containing all data from the INI file. [table]
 function LIP.load(fileName)
-	if (type(fileName) ~= 'string') then log.warn('Parameter "fileName" must be a string.'); end;
+	if (type(fileName) ~= 'string') then log.debug('Parameter "fileName" must be a string.'); end;
 	if (love.filesystem.getInfo(fileName) == nil) then log.error('Error loading file: ' .. fileName); return {}; end;
 
 	local data = {};
