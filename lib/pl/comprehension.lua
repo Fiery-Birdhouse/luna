@@ -34,7 +34,7 @@ local utils = require 'lib/pl.utils'
 
 local status,lb = pcall(require, "pl.luabalanced")
 if not status then
-    lb = require 'luabalanced'
+    lb = require 'lib/luabalanced'
 end
 
 local math_max = math.max
@@ -73,7 +73,6 @@ local ops = {
 -- @usage  "(x+y)^2 for x for y if x > y"  -- nested
 --
 local function parse_comprehension(expr)
-  local t = {}
   local pos = 1
 
   -- extract opname (if exists)

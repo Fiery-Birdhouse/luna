@@ -1,18 +1,11 @@
 --- MultiMap, a Map which has multiple values per key.
 --
--- Dependencies: `pl.utils`, `pl.class`, `pl.tablex`, `pl.List`
+-- Dependencies: `pl.utils`, `pl.class`, `pl.List`, `pl.Map`
 -- @classmod pl.MultiMap
 
-local classes = require 'lib/pl.class'
-local tablex = require 'lib/pl.tablex'
 local utils = require 'lib/pl.utils'
-local List = require 'lib/pl.List'
-
-local index_by,tsort,concat = tablex.index_by,table.sort,table.concat
-local append,extend,slice = List.append,List.extend,List.slice
-local append = table.insert
-
 local class = require 'lib/pl.class'
+local List = require 'lib/pl.List'
 local Map = require 'lib/pl.Map'
 
 -- MultiMap is a standard MT

@@ -1,6 +1,6 @@
 --- Iterators for extracting words or numbers from an input source.
 --
---    require 'pl'
+--    require 'lib/pl'
 --    local total,n = seq.sum(input.numbers())
 --    print('average',total/n)
 --
@@ -18,7 +18,6 @@ local unpack = utils.unpack
 local pairs,type,tonumber = pairs,type,tonumber
 local patterns = utils.patterns
 local io = io
-local assert_arg = utils.assert_arg
 
 local input = {}
 

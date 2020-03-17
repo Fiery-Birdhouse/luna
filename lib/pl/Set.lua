@@ -19,13 +19,13 @@
 --    > =  more_fruits, fruit
 --    [banana,apricot,apple,orange]	[banana,apple,orange]
 --
--- Depdencies: `pl.utils`, `pl.tablex`, `pl.class`, (`pl.List` if __tostring is used)
--- @module pl.Set
+-- Dependencies: `pl.utils`, `pl.tablex`, `pl.class`, `pl.Map`, (`pl.List` if __tostring is used)
+-- @classmod pl.Set
 
 local tablex = require 'lib/pl.tablex'
 local utils = require 'lib/pl.utils'
 local array_tostring, concat = utils.array_tostring, table.concat
-local tmakeset,deepcompare,merge,keys,difference,tupdate = tablex.makeset,tablex.deepcompare,tablex.merge,tablex.keys,tablex.difference,tablex.update
+local merge,difference = tablex.merge,tablex.difference
 local Map = require 'lib/pl.Map'
 local class = require 'lib/pl.class'
 local stdmt = utils.stdmt
