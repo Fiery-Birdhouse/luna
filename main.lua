@@ -42,12 +42,12 @@ function love.draw()
 	lovelyMoon.draw()
 end
 
-function love.keypressed(key)
-	InputVerify:keypressed(key)
+function love.keypressed(key, scancode)
+	InputVerify:keypressed(scancode)
 end
 
-function love.keyreleased(key)
-	InputVerify:keyreleased(key)
+function love.keyreleased(key, scancode)
+	InputVerify:keyreleased(scancode)
 end
 
 function love.mousepressed(x, y, button)

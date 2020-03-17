@@ -3,7 +3,7 @@ class.InputVerify()
 
 InputVerify.commandList = {
 	keyboard = {
-		["'"] = "console"
+		["`"] = "console"
 	}
 }
 
